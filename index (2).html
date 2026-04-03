@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>صفحتي السرية - لكل شخص عالمه</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 30px 20px;
+            direction: rtl;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .secret-content {
+            background: #f8f9ff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            border-right: 5px solid #764ba2;
+        }
+        .error {
+            background: #ffe0e0;
+            border-right-color: #e74c3c;
+            color: #c0392b;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .heart {
+            color: #ff6b6b;
+            font-size: 24px;
+        }
+        code {
+            background: #eee;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            direction: ltr;
+            display: inline-block;
+        }
+        img, video {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-top: 15px;
+        }
+        .btn {
+            display: inline-block;
+            background: #764ba2;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 30px;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #5a3a7a;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔐 صفحة رسائل سرية</h1>
+        <div class="heart">💖 لكل شخص رسالته الخاصة 💖</div>
+        <div id="content"></div>
+    </div>
+
+    <script>
+        // --------------------- قائمة المستخدمين ---------------------
+        // كل مستخدم له ID فريد والمحتوى الخاص به
+        // يمكنك إضافة أي عدد تريده
+        
+        const users = {
+            // مثال 1: رسالة نصية بسيطة
+            "AhmedLove2026": {
+                type: "text",
+                content: "🎉 يا أهلاً وسهلاً يا أحمد! دي صفحتك الخاصة جداً. أنت شخص مميز 🤍",
+                extra: "🌹 تقدر تضيف أي كلام حلو هنا"
+            },
+            
+            // مثال 2: صورة
+            "SaraSecret": {
+                type: "image",
+                content: "https://picsum.photos/id/104/400/300",  // صورة عشوائية جميلة
+                caption: "📸 دي صورة خاصة ليكي يا سارة"
+            },
+            
+            // مثال 3: فيديو من يوتيوب (embeded)
+            "MohamedFun": {
+                type: "video",
+                content: "https://www.youtube.com/embed/dQw4w9WgXcQ",  // ضع رابط الفيديو المدمج
+                caption: "🎬 فيديو خاص ليك يا محمد"
+            },
+            
+            // مثال 4: رابط خارجي
+            "LinaMusic": {
+                type: "link",
+                content: "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+                caption: "🎧 استمعي لهذه الأغنية اللي هتعجبك",
+                buttonText: "اذهب للرابط"
+            },
+            
+            // مثال 5: رسالة مع تأثير قلوب (مثل اللي في الصورة)
+            "Rohi2024": {
+                type: "heartMessage",
+                content: "يا روحي ❤️❤️❤️❤️❤️<br>هعيط والله ❤️❤️❤️❤️❤️",
+                extra: "مراسلة ❤️❤️❤️❤️❤️"
+            },
+            
+            // ⭐ أضف نفسك أنت هنا ⭐
+            "YourOwnSecretCode": {   // غير هذا الـ ID إلى كود سري تختاره
+                type: "text",
+                content: "💎 مرحباً بك في صفحتك السرية! دي خاصة بيك أنت فقط 💎<br>تقدر تحط أي شيء هنا: رسالة، صورة، فيديو، أو حتى سر.",
+                extra: "🔒 لا أحد غيرك يعرف هذا الرابط"
+            }
+        };
+        
+        // ----------------------------------------------------------
+        
+        // جلب الـ id من رابط الصفحة
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        const contentDiv = document.getElementById('content');
+        
+        function displayContent(userId, data) {
+            let html = `<div class="secret-content">`;
+            
+            switch(data.type) {
+                case "text":
+                    html += `<p>${data.content}</p>`;
+                    if(data.extra) html += `<p><small>${data.extra}</small></p>`;
+                    break;
+                    
+                case "image":
+                    html += `<img src="${data.content}" alt="صورة خاصة">`;
+                    if(data.caption) html += `<p>${data.caption}</p>`;
+                    break;
+                    
+                case "video":
+                    html += `<iframe width="100%" height="250" src="${data.content}" frameborder="0" allowfullscreen></iframe>`;
+                    if(data.caption) html += `<p>${data.caption}</p>`;
+                    break;
+                    
+                case "link":
+                    html += `<p>${data.caption || 'إضغط على الزر بالأسفل:'}</p>
+                             <a href="${data.content}" target="_blank" class="btn">${data.buttonText || 'فتح الرابط'}</a>`;
+                    break;
+                    
+                case "heartMessage":
+                    html += `<div style="font-size: 1.3rem; line-height: 2;">${data.content}</div>`;
+                    if(data.extra) html += `<div style="font-size: 1.2rem;">${data.extra}</div>`;
+                    break;
+                    
+                default:
+                    html += `<p>${data.content}</p>`;
+            }
+            
+            html += `</div>`;
+            contentDiv.innerHTML = html;
+        }
+        
+        function displayError(message) {
+            contentDiv.innerHTML = `<div class="secret-content error">
+                                        ⚠️ ${message}<br><br>
+                                        🔑 إذا لم يكن لديك رابط خاص، لا يمكنك الدخول.
+                                    </div>`;
+        }
+        
+        // التحقق من وجود id والمستخدم
+        if (id && users[id]) {
+            displayContent(id, users[id]);
+        } else if (id) {
+            displayError("الـ ID غير صحيح أو غير مسموح به.");
+        } else {
+            displayError("هذه صفحة سرية. لا يمكن الدخول بدون رابط مخصص.");
+            // يمكنك إظهار تلميح للكود (اختياري)
+            console.log("للدخول استخدم: ?id=YourOwnSecretCode");
+        }
+    </script>
+</body>
+</html>
